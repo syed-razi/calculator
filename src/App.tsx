@@ -1,13 +1,26 @@
 import { useState } from "react";
 
-import NumberButton from "./NumberButton";
+import ExpressionButton from "./ExpressionButton";
 
 function App() {
   const [expression, setExpression] = useState<string>("");
 
-  function handleClick(number: string) {
-    setExpression(expression + number);
-    console.log(expression + number);
+  function handleClick(expressionToken: string) {
+    setExpression(expression + expressionToken);
+    console.log(expression + expressionToken);
+  }
+
+  function evaluateExpression(expression: string): string {
+    try {
+      // Replace '^' with '**' for exponentiation
+      const cleanedExpression = expression.replace(/\^/g, "**");
+
+      const result = eval(cleanedExpression);
+
+      return result.toString();
+    } catch (error) {
+      return "Error: Invalid expression";
+    }
   }
 
   return (
@@ -25,31 +38,35 @@ function App() {
           <button className="h-1/2">Down</button>
         </div>
         <button>CH</button>
-        <button>C</button>
-        <button>DEL</button>
+        <button onClick={() => setExpression("")}>C</button>
+        <button onClick={() => setExpression(expression.slice(0, -1))}>
+          DEL
+        </button>
         <button>MC</button>
         <button>M+</button>
         <button>M-</button>
-        <NumberButton number="7" onClick={handleClick} />
-        <NumberButton number="8" onClick={handleClick} />
-        <NumberButton number="9" onClick={handleClick} />
-        <button>+</button>
+        <ExpressionButton expressionToken="7" onClick={handleClick} />
+        <ExpressionButton expressionToken="8" onClick={handleClick} />
+        <ExpressionButton expressionToken="9" onClick={handleClick} />
+        <ExpressionButton expressionToken="+" onClick={handleClick} />
         <button>MR</button>
-        <NumberButton number="4" onClick={handleClick} />
-        <NumberButton number="5" onClick={handleClick} />
-        <NumberButton number="6" onClick={handleClick} />
-        <button>-</button>
+        <ExpressionButton expressionToken="4" onClick={handleClick} />
+        <ExpressionButton expressionToken="5" onClick={handleClick} />
+        <ExpressionButton expressionToken="6" onClick={handleClick} />
+        <ExpressionButton expressionToken="-" onClick={handleClick} />
         <button>%</button>
-        <NumberButton number="1" onClick={handleClick} />
-        <NumberButton number="2" onClick={handleClick} />
-        <NumberButton number="3" onClick={handleClick} />
-        <button>*</button>
+        <ExpressionButton expressionToken="1" onClick={handleClick} />
+        <ExpressionButton expressionToken="2" onClick={handleClick} />
+        <ExpressionButton expressionToken="3" onClick={handleClick} />
+        <ExpressionButton expressionToken="*" onClick={handleClick} />
         <button>Sq</button>
-        <button>.</button>
-        <NumberButton number="0" onClick={handleClick} />
-        <button>=</button>
-        <button>/</button>
-        <button>^</button>
+        <ExpressionButton expressionToken="." onClick={handleClick} />
+        <ExpressionButton expressionToken="0" onClick={handleClick} />
+        <button onClick={() => setExpression(evaluateExpression(expression))}>
+          =
+        </button>
+        <ExpressionButton expressionToken="/" onClick={handleClick} />
+        <ExpressionButton expressionToken="^" onClick={handleClick} />
       </div>
     </div>
   );
