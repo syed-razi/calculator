@@ -13,9 +13,104 @@ function App() {
   function evaluateExpression(expression: string): string {
     try {
       // Replace '^' with '**' for exponentiation
-      const cleanedExpression = expression.replace(/\^/g, "**");
+      const replacedExponentExpression = expression.replace(/\^/g, "**");
 
-      const result = eval(cleanedExpression);
+      // Replace 'sq(expression)' with 'Math.sqrt(expression)'
+      const replacedSqrtExpression = replacedExponentExpression.replace(
+        /sq\(([^)]+)\)/g,
+        "Math.sqrt($1)",
+      );
+
+      // Replace different expressions with % with correctly evaluated expressions
+      const replacedBracketsPercentageExpression =
+        replacedSqrtExpression.replace(
+          /(\()([^()]+)(\))\s*%/g,
+          (_, openBrackets, expr, closeBrackets) => {
+            let result = 0;
+
+            if (openBrackets && closeBrackets) {
+              expr = `${openBrackets}${expr}${closeBrackets}`;
+              expr = evaluateExpression(expr);
+            }
+            result = parseFloat(expr) * 0.01;
+
+            return result.toString();
+          },
+        );
+
+      const replacedCompoundPercentageExpression =
+        replacedBracketsPercentageExpression.replace(
+          /([\d.]+)\s*([+-])\s*([\d.]+)%\s*([*^/])\s*(\(?)([^()]+)(\)?)/g,
+          (
+            _,
+            num1,
+            addOp,
+            percent,
+            multOp,
+            openingBracket,
+            expression,
+            closingBracket,
+          ) => {
+            let evalFirst = `${openingBracket}${expression}${closingBracket}`;
+            evalFirst = evaluateExpression(percent + "%" + multOp + evalFirst);
+            let num2 = parseFloat(evalFirst);
+
+            const result =
+              addOp === "+" ? parseFloat(num1) + num2 : parseFloat(num1) - num2;
+            return result.toString();
+          },
+        );
+
+      const replaceComplexAdditiveOperatorsPercentageExpression =
+        replacedCompoundPercentageExpression.replace(
+          /(\()([^()]+)(\))\s*([+-])\s*([\d.]+)%/g,
+          (
+            _,
+            openingBracket,
+            expression,
+            closingBracket,
+            operator,
+            percent,
+          ) => {
+            expression = `${openingBracket}${expression}${closingBracket}`;
+            let num = parseFloat(evaluateExpression(expression));
+            percent = parseFloat(percent);
+            const result =
+              operator === "+"
+                ? num + num * (percent / 100)
+                : num - num * (percent / 100);
+            return result.toString();
+          },
+        );
+
+      const replaceAdditiveOperatorsPercentageExpression =
+        replaceComplexAdditiveOperatorsPercentageExpression.replace(
+          /([\d.]+)\s*([+-])\s*([\d.]+)%/g,
+          (_, num, operator, percent) => {
+            num = parseFloat(num);
+            percent = parseFloat(percent);
+
+            const result =
+              operator === "+"
+                ? num + num * (percent / 100)
+                : num - num * (percent / 100);
+            return result.toString();
+          },
+        );
+
+      const replacePercentageExpression =
+        replaceAdditiveOperatorsPercentageExpression.replace(
+          /([\d.]+)%/g,
+          (_, num) => {
+            return (parseFloat(num) / 100).toString();
+          },
+        );
+
+      const result = eval(replacePercentageExpression);
+
+      if (typeof result !== "number") {
+        throw new Error("Result is not a valid number");
+      }
 
       return result.toString();
     } catch (error) {
