@@ -296,7 +296,14 @@ function App() {
           =
         </button>
         <ExpressionButton expressionToken="+" onClick={handleClick} />
-        <button>Sq</button>
+        <button
+          onClick={() => {
+            setExpression("sq(" + expression + ")");
+            setInputMode(true);
+          }}
+        >
+          Sq
+        </button>
         <ExpressionButton expressionToken="&#40;" onClick={handleClick} />
         <ExpressionButton expressionToken="&#41;" onClick={handleClick} />
       </div>
