@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import ExpressionButton from "./ExpressionButton";
+import SignUp from "./SignUp";
 
 function App() {
   const [expression, setExpression] = useState<string>("");
@@ -121,9 +122,7 @@ function App() {
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-start">
       <div className="flex h-16 w-screen items-center justify-end border-b shadow-md">
-        <button className="mx-4 h-8 w-24 rounded-md bg-blue-500 text-sm text-white shadow-lg shadow-blue-500/50">
-          Sign in
-        </button>
+        <SignUp />
       </div>
       <div className="mt-32 grid h-96 w-4/5 max-w-xl grid-cols-7 grid-rows-5 rounded-md border shadow-md lg:mt-48">
         <div className="col-span-6 self-stretch justify-self-stretch">
