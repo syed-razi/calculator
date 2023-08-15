@@ -5,7 +5,33 @@ import ExpressionButton from "./ExpressionButton";
 import SignUp from "./SignUp";
 
 function App() {
+  interface Display {
+    expression: string;
+    result: string;
+  }
+
   const [expression, setExpression] = useState<string>("");
+  const [email, setEmail] = useState<string | null>("");
+  const [history, setHistory] = useState<Display[]>([]);
+  const [inputMode, setInputMode] = useState<boolean>(true);
+  const [index, setIndex] = useState<number>(0);
+  let hasPrev = index > 0;
+  let hasNext = index < history.length - 1;
+
+  function handlePrevClick() {
+    if (hasPrev) {
+      setInputMode(false);
+      setIndex(index - 1);
+    }
+  }
+
+  function handleNextClick() {
+    if (hasNext) {
+      setInputMode(false);
+      setIndex(index + 1);
+    }
+  }
+
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -23,8 +49,9 @@ function App() {
   }, []);
 
   function handleClick(expressionToken: string) {
+    setExpression(expressionToken);
+    setInputMode(true);
     setExpression(expression + expressionToken);
-    console.log(expression + expressionToken);
   }
 
   function evaluateExpression(expression: string): string {
@@ -157,23 +184,54 @@ function App() {
         <div className="col-span-6 self-stretch justify-self-stretch">
           <input
             className="h-full w-full"
-            value={expression}
-            onChange={(e) => setExpression(e.target.value)}
+            value={inputMode ? expression : history[index].expression}
+            onChange={(e) => {
+              setInputMode(true);
+              setExpression(e.target.value);
+            }}
           />
+          <p>{!inputMode && history[index].result}</p>
         </div>
         <div className="flex h-full w-full flex-col">
-          <button className="h-1/2">Up</button>
-          <button className="h-1/2">Down</button>
+          <button onClick={handlePrevClick} className="h-1/2">
+            Up
+          </button>
+          <button onClick={handleNextClick} className="h-1/2">
+            Down
+          </button>
         </div>
         <ExpressionButton expressionToken="7" onClick={handleClick} />
         <ExpressionButton expressionToken="8" onClick={handleClick} />
         <ExpressionButton expressionToken="9" onClick={handleClick} />
         <ExpressionButton expressionToken="/" onClick={handleClick} />
-        <button onClick={() => setExpression(expression.slice(0, -1))}>
+        <button
+          onClick={() => {
+            setInputMode(true);
+            setExpression(expression.slice(0, -1));
+            setIndex(history.length);
+          }}
+        >
           DEL
         </button>
-        <button onClick={() => setExpression("")}>C</button>
-        <button>CH</button>
+        <button
+          onClick={() => {
+            setInputMode(true);
+            setExpression("");
+            setIndex(history.length);
+          }}
+        >
+          C
+        </button>
+        <button
+          onClick={() => {
+            setInputMode(true);
+            setExpression("");
+            setHistory([]);
+            setIndex(0);
+          }}
+        >
+          CH
+        </button>
         <ExpressionButton expressionToken="4" onClick={handleClick} />
         <ExpressionButton expressionToken="5" onClick={handleClick} />
         <ExpressionButton expressionToken="6" onClick={handleClick} />
@@ -190,7 +248,14 @@ function App() {
         <button>M-</button>
         <ExpressionButton expressionToken="." onClick={handleClick} />
         <ExpressionButton expressionToken="0" onClick={handleClick} />
-        <button onClick={() => setExpression(evaluateExpression(expression))}>
+        <button
+          onClick={() => {
+            setInputMode(false);
+            const newResult = evaluateExpression(expression);
+            setHistory([...history, { expression, result: newResult }]);
+            setIndex(history.length);
+          }}
+        >
           =
         </button>
         <ExpressionButton expressionToken="+" onClick={handleClick} />
