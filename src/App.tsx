@@ -13,6 +13,7 @@ function App() {
   const [expression, setExpression] = useState<string>("");
   const [email, setEmail] = useState<string | null>("");
   const [history, setHistory] = useState<Display[]>([]);
+  const [memory, setMemory] = useState<string[]>([]);
   const [inputMode, setInputMode] = useState<boolean>(true);
   const [index, setIndex] = useState<number>(0);
   let hasPrev = index > 0;
@@ -237,15 +238,51 @@ function App() {
         <ExpressionButton expressionToken="6" onClick={handleClick} />
         <ExpressionButton expressionToken="*" onClick={handleClick} />
         <ExpressionButton expressionToken="%" onClick={handleClick} />
-        <button>MC</button>
-        <button>MR</button>
+        <button
+          onClick={() => {
+            setInputMode(true);
+            setExpression("");
+            setMemory([]);
+          }}
+        >
+          MC
+        </button>
+        <button
+          onClick={() => {
+            const total = memory.reduce((acc, curr) => {
+              return acc + parseFloat(curr);
+            }, 0);
+            setInputMode(true);
+            setExpression(total.toString());
+          }}
+        >
+          MR
+        </button>
         <ExpressionButton expressionToken="1" onClick={handleClick} />
         <ExpressionButton expressionToken="2" onClick={handleClick} />
         <ExpressionButton expressionToken="3" onClick={handleClick} />
         <ExpressionButton expressionToken="-" onClick={handleClick} />
         <ExpressionButton expressionToken="^" onClick={handleClick} />
-        <button>M+</button>
-        <button>M-</button>
+        <button
+          onClick={() => {
+            setInputMode(true);
+            const newResult = evaluateExpression(expression);
+            setMemory([...memory, newResult]);
+            setExpression("");
+          }}
+        >
+          M+
+        </button>
+        <button
+          onClick={() => {
+            setInputMode(true);
+            const newResult = evaluateExpression(`(${expression}) * -1`);
+            setMemory([...memory, newResult]);
+            setExpression("");
+          }}
+        >
+          M-
+        </button>
         <ExpressionButton expressionToken="." onClick={handleClick} />
         <ExpressionButton expressionToken="0" onClick={handleClick} />
         <button
