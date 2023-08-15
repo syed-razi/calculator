@@ -1,7 +1,51 @@
 import { useState } from "react";
+import { auth } from "./firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
 export default function SignUp() {
   const [showModal, setShowModal] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(true);
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (showSignUp) {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+          // ..
+        });
+    } else {
+      // Login
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+          // ..
+        });
+    }
+  }
+
   return (
     <>
       <button
@@ -24,47 +68,65 @@ export default function SignUp() {
               <h3 className="w-full border-b border-solid border-slate-200 px-5 pb-2 text-center text-3xl font-semibold">
                 {showSignUp ? "Sign Up" : "Login"}
               </h3>
-              <div className="relative flex-auto px-6 py-3">
-                <label className="block">
+              <form
+                onSubmit={handleSubmit}
+                className="relative flex-auto px-6 py-3"
+              >
+                <label htmlFor="email" className="block">
                   <span className="my-1 block text-lg leading-relaxed text-slate-500 after:ml-0.5 after:text-red-500 after:content-['*']">
                     Email
                   </span>
                   <input
                     type="email"
-                    className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 placeholder-slate-400 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 sm:text-sm"
+                    className="shadow-s mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500  sm:text-sm"
                     placeholder="you@example.com"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </label>
-                <label className="block">
+                <label htmlFor="password" className="block">
                   <span className="my-1 block text-lg leading-relaxed text-slate-500 after:ml-0.5 after:text-red-500 after:content-['*']">
                     Password
                   </span>
                   <input
+                    id="password"
                     type="password"
                     className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 placeholder-slate-400 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 sm:text-sm"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </label>
                 {showSignUp && (
-                  <label className="block">
+                  <label htmlFor="passwordConfirm" className="block">
                     <span className="my-1 block text-lg leading-relaxed text-slate-500 after:ml-0.5 after:text-red-500 after:content-['*']">
                       Re-enter Password
                     </span>
                     <input
+                      id="passwordConfirm"
                       type="password"
                       className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 placeholder-slate-400 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 sm:text-sm"
+                      value={passwordConfirm}
+                      onChange={(e) => setPasswordConfirm(e.target.value)}
                     />
                   </label>
                 )}
-                <h2 className="mt-4 text-center">
-                  {showSignUp ? "Already" : "Not"} signed up?
-                </h2>
                 <button
-                  onClick={() => setShowSignUp(!showSignUp)}
-                  className="mx-auto block text-blue-400 underline active:text-blue-600"
+                  type="submit"
+                  className="mt-5 block w-full rounded-xl bg-blue-500 py-2 text-white shadow shadow-blue-500/50 outline-none transition-all duration-150 ease-linear hover:shadow-lg focus:outline-none"
                 >
-                  {showSignUp ? "Login" : "Sign Up"}
+                  {showSignUp ? "Sign Up" : "Login"}
                 </button>
-              </div>
+              </form>
+              <h2 className="mt-2 text-center">
+                {showSignUp ? "Already" : "Not"} signed up?
+              </h2>
+              <button
+                onClick={() => setShowSignUp(!showSignUp)}
+                className="mx-auto block text-blue-400 underline active:text-blue-600"
+              >
+                {showSignUp ? "Login" : "Sign Up"}
+              </button>
               <button
                 className="background-transparent mb-1 mr-1 px-6 py-2 text-sm font-bold uppercase text-red-500 outline-none transition-all duration-150 ease-linear focus:outline-none"
                 onClick={() => setShowModal(false)}
