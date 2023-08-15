@@ -62,7 +62,7 @@ function App() {
 
       // Replace 'sq(expression)' with 'Math.sqrt(expression)'
       const replacedSqrtExpression = replacedExponentExpression.replace(
-        /sq\(([^)]+)\)/g,
+        /√\(([^)]+)\)/g,
         "Math.sqrt($1)",
       );
 
@@ -298,11 +298,11 @@ function App() {
         <ExpressionButton expressionToken="+" onClick={handleClick} />
         <button
           onClick={() => {
-            setExpression("sq(" + expression + ")");
+            setExpression("√(" + expression + ")");
             setInputMode(true);
           }}
         >
-          Sq
+          √
         </button>
         <ExpressionButton expressionToken="&#40;" onClick={handleClick} />
         <ExpressionButton expressionToken="&#41;" onClick={handleClick} />
