@@ -143,7 +143,7 @@ export default function Calculator() {
   }
 
   return (
-    <div className="mt-32 grid h-96 w-4/5 max-w-xl grid-cols-7 grid-rows-5 rounded-md border shadow-md lg:mt-48">
+    <div className="m-12 grid h-96 w-4/5 max-w-xl grid-cols-7 grid-rows-5 rounded-md border shadow-md">
       <div className="col-span-6 self-stretch justify-self-stretch">
         <input
           className="h-full w-full"
