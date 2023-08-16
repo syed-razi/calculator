@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ExpressionButton from "./ExpressionButton";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 
 export default function Calculator() {
   interface Display {
@@ -155,12 +156,22 @@ export default function Calculator() {
         />
         <p>{!inputMode && history[index].result}</p>
       </div>
-      <div className="flex h-full w-full flex-col">
-        <button onClick={handlePrevClick} className="h-1/2">
-          Up
+      <div className="flex h-full w-full flex-col items-center justify-center">
+        <button
+          onClick={handlePrevClick}
+          className="my-1 w-3/4 cursor-pointer rounded-t-lg border-none bg-cyan-600 p-0 outline-offset-4"
+        >
+          <div className="mx-auto w-full -translate-y-2 transform rounded-t-lg bg-cyan-500 active:-translate-y-1">
+            <ChevronUpIcon className="mx-auto w-10 text-white" />
+          </div>
         </button>
-        <button onClick={handleNextClick} className="h-1/2">
-          Down
+        <button
+          onClick={handleNextClick}
+          className="w-3/4 cursor-pointer rounded-b-lg border-none bg-cyan-600 p-0 outline-offset-4"
+        >
+          <div className="mx-auto w-full -translate-y-2 transform rounded-b-lg bg-cyan-500 active:-translate-y-1">
+            <ChevronDownIcon className="mx-auto w-10 text-white" />
+          </div>
         </button>
       </div>
       <ExpressionButton expressionToken="7" onClick={handleClick} />
