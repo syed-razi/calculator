@@ -1,6 +1,6 @@
 import { useState } from "react";
-import ExpressionButton from "./ExpressionButton";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
+import Button from "./Button";
 
 export default function Calculator() {
   interface Display {
@@ -30,9 +30,67 @@ export default function Calculator() {
   }
 
   function handleClick(expressionToken: string) {
-    setExpression(expressionToken);
     setInputMode(true);
     setExpression(expression + expressionToken);
+  }
+
+  function handleDelete() {
+    setInputMode(true);
+    setExpression(expression.slice(0, -1));
+    setIndex(history.length);
+  }
+
+  function handleClear() {
+    setInputMode(true);
+    setExpression("");
+    setIndex(history.length);
+  }
+
+  function handleClearHistory() {
+    setInputMode(true);
+    setExpression("");
+    setHistory([]);
+    setIndex(0);
+  }
+
+  function handleClearMemory() {
+    setInputMode(true);
+    setExpression("");
+    setMemory([]);
+  }
+
+  function handleRetrieveMemory() {
+    const total = memory.reduce((acc, curr) => {
+      return acc + parseFloat(curr);
+    }, 0);
+    setInputMode(true);
+    setExpression(total.toString());
+  }
+
+  function handleAddToMemory() {
+    setInputMode(true);
+    const newResult = evaluateExpression(expression);
+    setMemory([...memory, newResult]);
+    setExpression("");
+  }
+
+  function handleSubtractFromMemory() {
+    setInputMode(true);
+    const newResult = evaluateExpression(`(${expression}) * -1`);
+    setMemory([...memory, newResult]);
+    setExpression("");
+  }
+
+  function handleEquals() {
+    setInputMode(false);
+    const newResult = evaluateExpression(expression);
+    setHistory([...history, { expression, result: newResult }]);
+    setIndex(history.length);
+  }
+
+  function handleSquareRoot() {
+    setExpression("√(" + expression + ")");
+    setInputMode(true);
   }
 
   function evaluateExpression(expression: string): string {
@@ -143,18 +201,71 @@ export default function Calculator() {
     }
   }
 
+  const buttonData = [
+    { label: "7", onClick: () => handleClick("7") },
+    { label: "8", onClick: () => handleClick("8") },
+    { label: "9", onClick: () => handleClick("9") },
+    { label: "/", onClick: () => handleClick("/") },
+    {
+      label: "DEL",
+      frontColour: "bg-red-500",
+      backColour: "bg-red-600",
+      textColour: "text-white",
+      onClick: () => handleDelete(),
+    },
+    {
+      label: "AC",
+      frontColour: "bg-red-500",
+      backColour: "bg-red-600",
+      textColour: "text-white",
+      onClick: () => handleClear(),
+    },
+    { label: "CH", onClick: () => handleClearHistory() },
+    { label: "4", onClick: () => handleClick("4") },
+    { label: "5", onClick: () => handleClick("5") },
+    { label: "6", onClick: () => handleClick("6") },
+    { label: "*", onClick: () => handleClick("*") },
+    { label: "%", onClick: () => handleClick("%") },
+    { label: "MC", onClick: () => handleClearMemory() },
+    { label: "MR", onClick: () => handleRetrieveMemory() },
+    { label: "1", onClick: () => handleClick("1") },
+    { label: "2", onClick: () => handleClick("2") },
+    { label: "3", onClick: () => handleClick("3") },
+    { label: "-", onClick: () => handleClick("-") },
+    { label: "^", onClick: () => handleClick("^") },
+    { label: "M+", onClick: () => handleAddToMemory() },
+    { label: "M-", onClick: () => handleSubtractFromMemory() },
+    { label: ".", onClick: () => handleClick(".") },
+    { label: "0", onClick: () => handleClick("0") },
+    {
+      label: "=",
+      frontColour: "bg-cyan-500",
+      backColour: "bg-cyan-600",
+      textColour: "text-white",
+      onClick: () => handleEquals(),
+    },
+    { label: "+", onClick: () => handleClick("+") },
+    { label: "√", onClick: () => handleSquareRoot() },
+    { label: "(", onClick: () => handleClick("(") },
+    { label: ")", onClick: () => handleClick(")") },
+  ];
+
   return (
-    <div className="m-12 grid h-96 w-4/5 max-w-xl grid-cols-7 grid-rows-5 rounded-md border shadow-md">
-      <div className="col-span-6 self-stretch justify-self-stretch">
-        <input
-          className="h-full w-full"
-          value={inputMode ? expression : history[index].expression}
-          onChange={(e) => {
-            setInputMode(true);
-            setExpression(e.target.value);
-          }}
-        />
-        <p>{!inputMode && history[index].result}</p>
+    <div className="m-12 grid h-96 w-4/5 max-w-xl grid-cols-7 rounded-2xl border bg-black p-2 shadow-md">
+      <div className="col-span-6 flex items-center justify-center">
+        <div className="mx-2 flex h-24 w-full flex-col items-center justify-between rounded-xl border bg-white p-2 font-mono">
+          <input
+            className="h-8 w-full self-start text-3xl"
+            value={inputMode ? expression : history[index].expression}
+            onChange={(e) => {
+              setInputMode(true);
+              setExpression(e.target.value);
+            }}
+          />
+          <p className="h-8 self-end text-3xl">
+            {!inputMode && history[index].result}
+          </p>
+        </div>
       </div>
       <div className="flex h-full w-full flex-col items-center justify-center">
         <button
@@ -174,111 +285,9 @@ export default function Calculator() {
           </div>
         </button>
       </div>
-      <ExpressionButton expressionToken="7" onClick={handleClick} />
-      <ExpressionButton expressionToken="8" onClick={handleClick} />
-      <ExpressionButton expressionToken="9" onClick={handleClick} />
-      <ExpressionButton expressionToken="/" onClick={handleClick} />
-      <button
-        onClick={() => {
-          setInputMode(true);
-          setExpression(expression.slice(0, -1));
-          setIndex(history.length);
-        }}
-      >
-        DEL
-      </button>
-      <button
-        onClick={() => {
-          setInputMode(true);
-          setExpression("");
-          setIndex(history.length);
-        }}
-      >
-        C
-      </button>
-      <button
-        onClick={() => {
-          setInputMode(true);
-          setExpression("");
-          setHistory([]);
-          setIndex(0);
-        }}
-      >
-        CH
-      </button>
-      <ExpressionButton expressionToken="4" onClick={handleClick} />
-      <ExpressionButton expressionToken="5" onClick={handleClick} />
-      <ExpressionButton expressionToken="6" onClick={handleClick} />
-      <ExpressionButton expressionToken="*" onClick={handleClick} />
-      <ExpressionButton expressionToken="%" onClick={handleClick} />
-      <button
-        onClick={() => {
-          setInputMode(true);
-          setExpression("");
-          setMemory([]);
-        }}
-      >
-        MC
-      </button>
-      <button
-        onClick={() => {
-          const total = memory.reduce((acc, curr) => {
-            return acc + parseFloat(curr);
-          }, 0);
-          setInputMode(true);
-          setExpression(total.toString());
-        }}
-      >
-        MR
-      </button>
-      <ExpressionButton expressionToken="1" onClick={handleClick} />
-      <ExpressionButton expressionToken="2" onClick={handleClick} />
-      <ExpressionButton expressionToken="3" onClick={handleClick} />
-      <ExpressionButton expressionToken="-" onClick={handleClick} />
-      <ExpressionButton expressionToken="^" onClick={handleClick} />
-      <button
-        onClick={() => {
-          setInputMode(true);
-          const newResult = evaluateExpression(expression);
-          setMemory([...memory, newResult]);
-          setExpression("");
-        }}
-      >
-        M+
-      </button>
-      <button
-        onClick={() => {
-          setInputMode(true);
-          const newResult = evaluateExpression(`(${expression}) * -1`);
-          setMemory([...memory, newResult]);
-          setExpression("");
-        }}
-      >
-        M-
-      </button>
-      <ExpressionButton expressionToken="." onClick={handleClick} />
-      <ExpressionButton expressionToken="0" onClick={handleClick} />
-      <button
-        onClick={() => {
-          setInputMode(false);
-          const newResult = evaluateExpression(expression);
-          setHistory([...history, { expression, result: newResult }]);
-          setIndex(history.length);
-        }}
-      >
-        =
-      </button>
-      <ExpressionButton expressionToken="+" onClick={handleClick} />
-      <button
-        onClick={() => {
-          setExpression("√(" + expression + ")");
-          setInputMode(true);
-        }}
-      >
-        √
-      </button>
-      <ExpressionButton expressionToken="&#40;" onClick={handleClick} />
-      <ExpressionButton expressionToken="&#41;" onClick={handleClick} />
+      {buttonData.map((buttonProps, index) => (
+        <Button key={index} {...buttonProps} />
+      ))}
     </div>
   );
 }
